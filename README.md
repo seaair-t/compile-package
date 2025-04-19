@@ -1,4 +1,4 @@
-### small-compile
+###  small-package-compile
 [1]: https://img.shields.io/badge/license-GPLV2-brightgreen.svg
 [2]: /LICENSE
 [3]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
@@ -9,7 +9,7 @@
 [8]: https://github.com/kenzok8/compile-package/releases
 [10]: https://img.shields.io/badge/Contact-telegram-blue
 [11]: https://t.me/joinchat/JjxmyRZZXJWb74I-sCrryA
-[12]: https://github.com/kenzok8/compile-package/workflows/autobuild/badge.svg
+[12]: https://github.com/kenzok8/compile-package/actions/workflows/Auto-Package.yml/badge.svg
 [13]: https://github.com/kenzok8/compile-package/actions
 
 [![license][1]][2]
@@ -29,12 +29,12 @@
 
 ##### 特色:
 
-+ openwrt下small-package包插件x86编译.
+ openwrt下small-package包插件多架构编译..
 
-+ .* 编译所有软件包
+ .* 编译所有软件包
 
-+ .* 2 编译最近两天内有更新的软件包.
+ .* 2 编译最近两天内有更新的软件包.
 
-+ luci-app 编译所有 luci-app 软件包
+ luci-app 编译所有 luci-app 软件包
 
-+ luci-app-(aliddns|bypass) 编译 luci-app-aliddns 和 luci-app-bypass
+ luci-app-(aliddns|bypass) 编译 luci-app-aliddns 和 luci-app-bypass
