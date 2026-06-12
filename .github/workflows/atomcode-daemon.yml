@@ -1,0 +1,55 @@
+name: Build AtomCode Daemon
+
+on:
+workflow_dispatch:
+
+permissions:
+contents: write
+
+jobs:
+build:
+runs-on: windows-latest
+
+```
+steps:
+  - name: Install Rust
+    uses: dtolnay/rust-toolchain@stable
+
+  - name: Cache Cargo
+    uses: Swatinem/rust-cache@v2
+
+  - name: Clone AtomCode
+    run: |
+      git clone --depth 1 https://github.com/atomgit-atomcode/atomcode.git source
+
+  - name: Show Rust Version
+    run: rustc --version
+
+  - name: Build atomcode-daemon
+    working-directory: source
+    run: |
+      cargo build --release -p atomcode-daemon
+
+  - name: Verify Output
+    run: |
+      dir source\target\release
+
+  - name: Upload Artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: atomcode-daemon-windows-x64
+      path: source/target/release/atomcode-daemon.exe
+      if-no-files-found: error
+
+  - name: Create Release Tag
+    shell: pwsh
+    run: |
+      $tag = "build-" + (Get-Date -Format "yyyyMMdd-HHmmss")
+      echo "TAG=$tag" >> $env:GITHUB_ENV
+
+  - name: Publish Release
+    uses: softprops/action-gh-release@v2
+    with:
+      tag_name: ${{ env.TAG }}
+      files: source/target/release/atomcode-daemon.exe
+```
