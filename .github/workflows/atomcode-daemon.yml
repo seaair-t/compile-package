@@ -1,4 +1,4 @@
-name: Build atomcode-daemon
+name: Build atomcode-daemon (Windows)
 
 on:
   workflow_dispatch:
@@ -13,30 +13,7 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-            artifact_name: atomcode-daemon
-            asset_suffix: linux-amd64
-
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            artifact_name: atomcode-daemon
-            asset_suffix: macos-amd64
-
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            artifact_name: atomcode-daemon
-            asset_suffix: macos-arm64
-
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            artifact_name: atomcode-daemon.exe
-            asset_suffix: windows-amd64
-
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
 
     steps:
       - name: Checkout
@@ -48,7 +25,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: x86_64-pc-windows-msvc
 
       - name: Cache cargo
         uses: actions/cache@v4
@@ -57,29 +34,35 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+          key: windows-cargo-${{ hashFiles('Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            windows-cargo-
 
-      - name: Build (Linux/macOS)
-        if: runner.os != 'Windows'
+      # webui/dist/ 在仓库里不存在，rust-embed 需要该目录存在才能编译
+      - name: Create webui/dist/ placeholder
+        shell: bash
         run: |
-          cargo build -p atomcode-daemon --release --target ${{ matrix.target }}
+          mkdir -p webui/dist
+          cat > webui/dist/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html><head><meta charset="utf-8"><title>AtomCode Daemon</title></head>
+          <body><p>AtomCode Daemon running. Connect your client.</p></body>
+          </html>
+          EOF
 
-      - name: Build (Windows)
-        if: runner.os == 'Windows'
+      - name: Build
         run: |
-          cargo build -p atomcode-daemon --release --target ${{ matrix.target }}
+          cargo build -p atomcode-daemon --release --target x86_64-pc-windows-msvc
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: atomcode-daemon-${{ matrix.asset_suffix }}
-          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          name: atomcode-daemon-windows-amd64
+          path: target\x86_64-pc-windows-msvc\release\atomcode-daemon.exe
 
       - name: Upload to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}
+          files: target\x86_64-pc-windows-msvc\release\atomcode-daemon.exe
           append_body: true
