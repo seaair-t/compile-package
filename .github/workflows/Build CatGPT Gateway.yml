@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Clone upstream
         run: |
-          git clone --recursive https://github.com/seaair-t/cat-gpt.git source
+          git clone --recursive https://seaair-t:${{ secrets.GH_TOKEN }}@github.com/seaair-t/cat-gpt.git source
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
